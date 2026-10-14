@@ -1,5 +1,14 @@
 {
- "current": { "pc": 0, "android": 0 },
- "updated": null,
- "history": []
+ "current": {
+  "pc": 0,
+  "android": 0
+ },
+ "updated": "2026-10-14T13:34:32.882Z",
+ "history": [
+  {
+   "t": "2026-10-14T13:34:32.882Z",
+   "pc": 0,
+   "android": 0
+  }
+ ]
 }
