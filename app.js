@@ -32,39 +32,41 @@
 
   // ---------- download counters ----------
   function fmt(n) { return n.toLocaleString("ru-RU"); }
+  var shown = { pc: 0, android: 0 };
   function showCounts(c) {
-    var pc = c.pc || 0, android = c.android || 0;
-    $('[data-count="pc"]').textContent = "скачали " + fmt(pc);
-    $('[data-count="android"]').textContent = "скачали " + fmt(android);
-    if (pc + android > 0) {
-      $("#total-count").textContent = fmt(pc + android);
+    // счётчики только растут: не откатываем цифру, если ответ пришёл старый
+    shown.pc = Math.max(shown.pc, c.pc || 0);
+    shown.android = Math.max(shown.android, c.android || 0);
+    $('[data-count="pc"]').textContent = "скачали " + fmt(shown.pc);
+    $('[data-count="android"]').textContent = "скачали " + fmt(shown.android);
+    if (shown.pc + shown.android > 0) {
+      $("#total-count").textContent = fmt(shown.pc + shown.android);
       $("#total-line").hidden = false;
     }
   }
-  function countsFromReleases(releases) {
-    var c = { pc: 0, android: 0 };
-    releases.forEach(function (r) {
-      (r.assets || []).forEach(function (a) {
-        if (a.name === SITE.files.pc.name) c.pc += a.download_count;
-        if (a.name === SITE.files.android.name) c.android += a.download_count;
-      });
-    });
-    return c;
-  }
   function loadCounts() {
-    if (SITE.repo.indexOf("OWNER/") === 0) return;
-    fetch("https://api.github.com/repos/" + SITE.repo + "/releases?per_page=100")
-      .then(function (r) { if (!r.ok) throw r; return r.json(); })
-      .then(function (rel) { showCounts(countsFromReleases(rel)); })
-      .catch(function () {
-        // запасной путь: снимок, который пишет GitHub Action
-        fetch("stats.json", { cache: "no-store" })
-          .then(function (r) { return r.json(); })
-          .then(function (s) { if (s.current) showCounts(s.current); })
-          .catch(function () {});
-      });
+    DMCounts.merged().then(function (c) {
+      if (c) { showCounts(c); return; }
+      // запасной путь: снимок, который пишет GitHub Action
+      fetch("stats.json", { cache: "no-store" })
+        .then(function (r) { return r.json(); })
+        .then(function (s) { if (s.current) showCounts(s.current); })
+        .catch(function () {});
+    });
   }
   loadCounts();
+
+  // каждое нажатие на кнопку засчитывается сразу; само скачивание идёт по ссылке
+  $$(".plate").forEach(function (a) {
+    a.addEventListener("click", function () {
+      var key = a.dataset.platform;
+      DMCounts.hit(key).then(function (v) {
+        var c = {}; c[key] = v; showCounts(c);
+      }).catch(function () {
+        var c = {}; c[key] = shown[key] + 1; showCounts(c);
+      });
+    });
+  });
 
   // ---------- embers ----------
   var embers = $(".embers");
