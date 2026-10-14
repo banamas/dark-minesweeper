@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dark Minesweeper — скачать игру</title>
+<meta name="description" content="Dark Minesweeper — сапёр в тёмном фэнтези, где ворон учит рассуждать по числам. Скачать для Windows и Android.">
+<meta property="og:title" content="Dark Minesweeper">
+<meta property="og:description" content="Найди мины · Переживи тьму. Скачать для ПК и телефона.">
+<meta property="og:image" content="img/title.jpg">
+<meta name="theme-color" content="#0b0a0c">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%231c1a1f'/%3E%3Ctext x='16' y='23' font-family='serif' font-size='20' text-anchor='middle' fill='%23e8893a'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+SC:wght@500;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-bg" aria-hidden="true"></div>
+  <span class="torch t1" aria-hidden="true"></span>
+  <span class="torch t2" aria-hidden="true"></span>
+  <span class="torch t3" aria-hidden="true"></span>
+  <span class="torch t4" aria-hidden="true"></span>
+  <div class="embers" aria-hidden="true"></div>
+
+  <div class="hero-inner">
+    <p class="eyebrow">Сапёр в тёмном фэнтези</p>
+    <h1 class="logo">Dark<br>Minesweeper</h1>
+    <p class="tagline">Найди мины <span>·</span> Переживи тьму</p>
+    <p class="lead">Спустись в подземелье с факелом и вороном-наставником. Ворон не играет за тебя — он учит читать числа так, чтобы ты сам видел, где прячется смерть.</p>
+
+    <div class="downloads" id="download">
+      <a class="plate" data-platform="pc" href="#" rel="nofollow">
+        <span class="plate-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M3 5.5 10 4.5v7H3zM11 4.4 21 3v8.5H11zM3 12.5h7v7l-7-1zM11 12.5h10V21l-10-1.4z"/></svg>
+        </span>
+        <span class="plate-text">
+          <span class="plate-title">Скачать для ПК</span>
+          <span class="plate-meta">Windows 10 / 11 · ZIP · <b data-size="pc"></b></span>
+        </span>
+        <span class="plate-count" data-count="pc" title="Сколько раз скачали"></span>
+      </a>
+      <a class="plate" data-platform="android" href="#" rel="nofollow">
+        <span class="plate-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path fill-rule="evenodd" d="M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 3v13h8V5zm4 14.2a1 1 0 1 0 0 .01z"/></svg>
+        </span>
+        <span class="plate-text">
+          <span class="plate-title">Скачать на телефон</span>
+          <span class="plate-meta">Android 5.0+ · APK · <b data-size="android"></b></span>
+        </span>
+        <span class="plate-count" data-count="android" title="Сколько раз скачали"></span>
+      </a>
+    </div>
+    <p class="note" id="platform-note">Бесплатно · без интернета · без рекламы</p>
+    <p class="total" id="total-line" hidden>Путников уже спустилось во тьму: <b id="total-count">0</b></p>
+  </div>
+  <a class="scroll-cue" href="#raven" aria-label="Листать вниз"></a>
+</header>
+
+<main>
+
+  <section class="section" id="raven">
+    <div class="section-head">
+      <p class="eyebrow">Ворон</p>
+      <h2>Наставник, который не подсказывает ответ</h2>
+      <p class="sub">Ворон рассуждает только тем, что видел ты, и ведёт тебя к ответу вопросами.</p>
+    </div>
+    <div class="raven-grid">
+      <figure class="frame shot" data-full="img/raven.jpg">
+        <img src="img/raven.jpg" alt="Обучение: ворон играет сам и думает вслух" loading="lazy">
+      </figure>
+      <div class="raven-dialog">
+        <div class="dialog-box">
+          <p class="speaker">Ворон</p>
+          <p class="line" id="raven-line">Тьма тут густая. Держись круга света, и доживём до выхода.</p>
+        </div>
+        <ul class="rungs">
+          <li><span>I</span>На какое число смотреть</li>
+          <li><span>II</span>Какое правило работает</li>
+          <li><span>III</span>«Сколько мин ещё ищет число?»</li>
+        </ul>
+        <p class="small">Подсказка по клавише <kbd>H</kbd> — в три ступени. Последний шаг всегда делаешь сам.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <p class="eyebrow">Что внутри</p>
+      <h2>Ремесло сапёра</h2>
+    </div>
+    <div class="features">
+      <article class="feat"><span class="rune n1">1</span><h3>Лупа числа</h3><p>Наведи на число — подсветятся соседи и подсчёт: сколько мин ещё ищем и сколько плит закрыто.</p></article>
+      <article class="feat"><span class="rune n2">2</span><h3>Обучение для детей</h3><p>Короткие шаги «смотри → вместе → сам». Проиграть нельзя, в конце мини-проверка.</p></article>
+      <article class="feat"><span class="rune n3">3</span><h3>Разбор ошибок</h3><p>После подрыва ворон скажет честно: «это можно было понять» или «это был честный риск».</p></article>
+      <article class="feat"><span class="rune n4">4</span><h3>Тёмные дары</h3><p>Ведьмин глаз, Предчувствие, Некромантия, Жертва и Заморозка — у каждой силы своя цена.</p></article>
+      <article class="feat"><span class="rune n5">5</span><h3>Режим учителя</h3><p>Под PIN: длительность урока, лимит подсказок, одинаковые уровни, журнал и экспорт в Excel.</p></article>
+      <article class="feat"><span class="rune n6">6</span><h3>Для всех</h3><p>Русский и казахский языки, формы чисел для дальтоников, крупный шрифт, без вспышек и тряски.</p></article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <p class="eyebrow">Земли</p>
+      <h2>Деревня, Лес, Подземелья</h2>
+      <p class="sub">Чем глубже — тем гуще тьма. Свет факела гаснет, а выход заперт, пока не найдёшь ключ.</p>
+    </div>
+    <div class="gallery">
+      <figure class="frame shot wide" data-full="img/dungeon.jpg"><img src="img/dungeon.jpg" alt="Подземелья: ведьмин глаз и ворон" loading="lazy"><figcaption>Подземелья</figcaption></figure>
+      <figure class="frame shot" data-full="img/village.jpg"><img src="img/village.jpg" alt="Деревня: лупа числа" loading="lazy"><figcaption>Деревня</figcaption></figure>
+      <figure class="frame shot" data-full="img/mistake.jpg"><img src="img/mistake.jpg" alt="Разбор ошибки" loading="lazy"><figcaption>Разбор ошибки</figcaption></figure>
+      <figure class="frame shot" data-full="img/tutorial.jpg"><img src="img/tutorial.jpg" alt="Обучение" loading="lazy"><figcaption>Обучение</figcaption></figure>
+      <figure class="frame shot" data-full="img/teacher.jpg"><img src="img/teacher.jpg" alt="Режим учителя" loading="lazy"><figcaption>Режим учителя</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="section trial">
+    <div class="section-head">
+      <p class="eyebrow">Испытание</p>
+      <h2>Открой плиту</h2>
+      <p class="sub">Девять на девять, десять мин. Нажми — открыть, правая кнопка или долгое нажатие — флаг.</p>
+    </div>
+    <div class="board-wrap">
+      <div class="board-hud">
+        <span>Мин: <b id="mines-left">10</b></span>
+        <button type="button" id="flag-mode" class="hud-btn" aria-pressed="false">Флажок: выкл</button>
+        <button type="button" id="restart" class="hud-btn">Заново</button>
+      </div>
+      <div class="board" id="board" role="grid" aria-label="Мини-сапёр"></div>
+      <p class="board-msg" id="board-msg">&nbsp;</p>
+    </div>
+  </section>
+
+  <section class="section" id="install">
+    <div class="section-head">
+      <p class="eyebrow">Ритуал установки</p>
+      <h2>Как запустить</h2>
+    </div>
+    <div class="install">
+      <div class="frame scroll">
+        <h3>На компьютере</h3>
+        <ol>
+          <li>Скачай архив <code data-file="pc"></code>.</li>
+          <li>Распакуй его в любую папку: правой кнопкой → «Извлечь всё».</li>
+          <li>Запусти <code>DarkMinesweeper.exe</code>. Файл <code>.pck</code> должен лежать рядом.</li>
+          <li>Если Windows покажет «Компьютер защищён» — нажми «Подробнее» → «Выполнить в любом случае».</li>
+        </ol>
+      </div>
+      <div class="frame scroll">
+        <h3>На Android</h3>
+        <ol>
+          <li>Скачай файл <code data-file="android"></code> прямо на телефон.</li>
+          <li>Открой его. Android спросит разрешение на установку из неизвестных источников — разреши.</li>
+          <li>Нажми «Установить» и запусти Dark Minesweeper. Держи телефон горизонтально.</li>
+          <li>Флажок — долгое нажатие на плиту, лупа — нажатие на цифру, масштаб — двумя пальцами.</li>
+        </ol>
+        <p class="small">На iPhone игра пока не выходит.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p class="logo small-logo">Dark Minesweeper</p>
+  <p>Работает без интернета. Сделано на Godot.</p>
+  <p><a href="#download">Скачать</a> · <a href="stats.html">Летопись скачиваний</a></p>
+</footer>
+
+<div class="lightbox" id="lightbox" hidden>
+  <button type="button" class="lb-close" aria-label="Закрыть">×</button>
+  <img alt="">
+</div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
