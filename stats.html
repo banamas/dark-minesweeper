@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Летопись скачиваний — Dark Minesweeper</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+SC:wght@500;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  .stats { max-width: 980px; margin: 0 auto; padding: 56px 16px 24px; }
+  .back { font-family: var(--heading); letter-spacing: .1em; text-decoration: none; }
+  .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 32px 0; }
+  .tile { padding: 20px 22px; background: linear-gradient(160deg, var(--stone-2), var(--stone)); border: 1px solid var(--bronze-dim); }
+  .tile .k { font-family: var(--heading); letter-spacing: .2em; text-transform: uppercase; font-size: .78rem; color: var(--muted); }
+  .tile .v { font-family: var(--display); font-weight: 700; font-size: 2.4rem; color: var(--parchment); line-height: 1.2; }
+  .tile .d { font-size: .9rem; color: var(--muted); }
+  .tile .d b { color: var(--n2); font-weight: 600; }
+  .panel { padding: 22px; background: var(--bg-2); border: 1px solid #221f25; margin-bottom: 20px; }
+  .panel h2 { font-family: var(--heading); color: var(--parchment); font-size: 1.5rem; margin: 0 0 4px; }
+  .legend { display: flex; gap: 18px; font-size: .9rem; color: var(--muted); margin-bottom: 12px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: middle; }
+  .chart { width: 100%; height: 240px; display: block; }
+  .chart text { fill: var(--muted); font: 12px var(--body); }
+  table { width: 100%; border-collapse: collapse; font-size: .98rem; }
+  th, td { text-align: right; padding: 8px 10px; border-bottom: 1px solid #221f25; font-variant-numeric: tabular-nums; }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-family: var(--heading); letter-spacing: .1em; color: var(--muted); font-weight: 500; }
+  .empty { color: var(--muted); font-style: italic; }
+  .tip { position: fixed; pointer-events: none; background: #0f0e11; border: 1px solid var(--bronze-dim); padding: 6px 10px; font-size: .9rem; color: var(--parchment); z-index: 10; }
+  @media (max-width: 640px) { .tiles { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="stats">
+  <a class="back" href="index.html">← На главную</a>
+  <div class="section-head" style="margin-top:28px">
+    <p class="eyebrow">Dark Minesweeper</p>
+    <h2>Летопись скачиваний</h2>
+    <p class="sub" id="updated">Загружаю…</p>
+  </div>
+
+  <div class="tiles">
+    <div class="tile"><div class="k">Всего</div><div class="v" id="t-all">—</div><div class="d" id="d-all"></div></div>
+    <div class="tile"><div class="k">ПК · Windows</div><div class="v" id="t-pc" style="color:var(--n1)">—</div><div class="d" id="d-pc"></div></div>
+    <div class="tile"><div class="k">Телефон · Android</div><div class="v" id="t-android" style="color:var(--ember)">—</div><div class="d" id="d-android"></div></div>
+  </div>
+
+  <section class="panel">
+    <h2>По дням</h2>
+    <div class="legend"><span><i style="background:var(--n1)"></i>ПК</span><span><i style="background:var(--ember)"></i>Android</span></div>
+    <svg class="chart" id="chart" role="img" aria-label="Скачивания по дням"></svg>
+  </section>
+
+  <section class="panel">
+    <h2>Последние дни</h2>
+    <table>
+      <thead><tr><th>День</th><th>ПК</th><th>Android</th><th>Всего</th></tr></thead>
+      <tbody id="rows"><tr><td colspan="4" class="empty">Пока нет данных</td></tr></tbody>
+    </table>
+  </section>
+  <p class="small">Счётчики ведёт GitHub: каждое скачивание файла из релиза засчитывается. Снимок по дням обновляется автоматически раз в час.</p>
+</main>
+<div class="tip" id="tip" hidden></div>
+
+<script src="config.js"></script>
+<script>
+(function () {
+  var SITE = window.SITE;
+  var fmt = function (n) { return (n || 0).toLocaleString("ru-RU"); };
+  var $ = function (id) { return document.getElementById(id); };
+
+  function dayKey(iso) { return iso.slice(0, 10); }
+  function dayLabel(k) {
+    var d = new Date(k + "T12:00:00Z");
+    return d.toLocaleDateString("ru-RU", { day: "numeric", month: "short" });
+  }
+
+  // история: снимки накопительных счётчиков → прирост по дням
+  function daily(history) {
+    var last = {};
+    history.forEach(function (s) { last[dayKey(s.t)] = s; });
+    var keys = Object.keys(last).sort(), out = [], prev = { pc: 0, android: 0 };
+    keys.forEach(function (k, i) {
+      var s = last[k];
+      out.push({ day: k, pc: Math.max(0, s.pc - prev.pc), android: Math.max(0, s.android - prev.android) });
+      prev = s;
+    });
+    return out;
+  }
+
+  function drawChart(days) {
+    var svg = $("chart"), tip = $("tip");
+    var w = svg.clientWidth || 900, h = 240, pad = { l: 34, r: 8, t: 10, b: 26 };
+    svg.setAttribute("viewBox", "0 0 " + w + " " + h);
+    days = days.slice(-30);
+    if (!days.length) { svg.innerHTML = '<text x="' + w / 2 + '" y="' + h / 2 + '" text-anchor="middle">Данные появятся после первых скачиваний</text>'; return; }
+    var max = Math.max.apply(null, days.map(function (d) { return d.pc + d.android; }).concat(1));
+    var step = Math.pow(10, Math.floor(Math.log10(max)));
+    var top = Math.ceil(max / step) * step;
+    var iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+    var bw = Math.min(28, iw / days.length * 0.7), gap = iw / days.length;
+    var y = function (v) { return pad.t + ih - v / top * ih; };
+    var g = "";
+    [0, top / 2, top].forEach(function (v) {
+      g += '<line x1="' + pad.l + '" x2="' + (w - pad.r) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="#221f25"/>';
+      g += '<text x="' + (pad.l - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + fmt(Math.round(v)) + '</text>';
+    });
+    days.forEach(function (d, i) {
+      var x = pad.l + gap * i + (gap - bw) / 2;
+      var hp = d.pc / top * ih, ha = d.android / top * ih;
+      g += '<g data-i="' + i + '">';
+      g += '<rect x="' + x + '" y="' + (pad.t + ih - hp) + '" width="' + bw + '" height="' + hp + '" fill="var(--n1)"/>';
+      g += '<rect x="' + x + '" y="' + (pad.t + ih - hp - ha - (ha && hp ? 2 : 0)) + '" width="' + bw + '" height="' + ha + '" fill="var(--ember)"/>';
+      g += '<rect x="' + (pad.l + gap * i) + '" y="' + pad.t + '" width="' + gap + '" height="' + ih + '" fill="transparent"/>';
+      g += '</g>';
+      var every = Math.ceil(days.length / 8);
+      if (i % every === 0 || i === days.length - 1)
+        g += '<text x="' + (x + bw / 2) + '" y="' + (h - 6) + '" text-anchor="middle">' + dayLabel(d.day) + '</text>';
+    });
+    svg.innerHTML = g;
+    svg.onmousemove = function (e) {
+      var grp = e.target.closest("g[data-i]");
+      if (!grp) { tip.hidden = true; return; }
+      var d = days[+grp.dataset.i];
+      tip.innerHTML = dayLabel(d.day) + ": ПК " + fmt(d.pc) + " · Android " + fmt(d.android);
+      tip.style.left = (e.clientX + 12) + "px";
+      tip.style.top = (e.clientY - 34) + "px";
+      tip.hidden = false;
+    };
+    svg.onmouseleave = function () { tip.hidden = true; };
+  }
+
+  function render(current, history, updated) {
+    $("t-all").textContent = fmt(current.pc + current.android);
+    $("t-pc").textContent = fmt(current.pc);
+    $("t-android").textContent = fmt(current.android);
+    $("updated").textContent = updated ? "Обновлено " + new Date(updated).toLocaleString("ru-RU") : "";
+    var days = daily(history);
+    var today = days.length && days[days.length - 1].day === new Date().toISOString().slice(0, 10) ? days[days.length - 1] : null;
+    if (today) {
+      $("d-all").innerHTML = "сегодня <b>+" + fmt(today.pc + today.android) + "</b>";
+      $("d-pc").innerHTML = "сегодня <b>+" + fmt(today.pc) + "</b>";
+      $("d-android").innerHTML = "сегодня <b>+" + fmt(today.android) + "</b>";
+    }
+    var rows = days.slice(-14).reverse().map(function (d) {
+      return "<tr><td>" + dayLabel(d.day) + "</td><td>" + fmt(d.pc) + "</td><td>" + fmt(d.android) + "</td><td>" + fmt(d.pc + d.android) + "</td></tr>";
+    }).join("");
+    if (rows) $("rows").innerHTML = rows;
+    drawChart(days);
+    window.onresize = function () { drawChart(days); };
+  }
+
+  fetch("stats.json", { cache: "no-store" })
+    .then(function (r) { return r.ok ? r.json() : { history: [] }; })
+    .catch(function () { return { history: [] }; })
+    .then(function (s) {
+      var history = s.history || [];
+      var current = s.current || { pc: 0, android: 0 };
+      render(current, history, s.updated);
+      if (SITE.repo.indexOf("OWNER/") === 0) return;
+      // живые цифры прямо из GitHub — свежее, чем часовой снимок
+      fetch("https://api.github.com/repos/" + SITE.repo + "/releases?per_page=100")
+        .then(function (r) { if (!r.ok) throw r; return r.json(); })
+        .then(function (rel) {
+          var c = { pc: 0, android: 0 };
+          rel.forEach(function (r) { r.assets.forEach(function (a) {
+            if (a.name === SITE.files.pc.name) c.pc += a.download_count;
+            if (a.name === SITE.files.android.name) c.android += a.download_count;
+          }); });
+          var now = new Date().toISOString();
+          render(c, history.concat([{ t: now, pc: c.pc, android: c.android }]), now);
+        })
+        .catch(function () {});
+    });
+})();
+</script>
+</body>
+</html>
