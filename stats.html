@@ -62,11 +62,12 @@
       <tbody id="rows"><tr><td colspan="4" class="empty">Пока нет данных</td></tr></tbody>
     </table>
   </section>
-  <p class="small">Счётчики ведёт GitHub: каждое скачивание файла из релиза засчитывается. Снимок по дням обновляется автоматически раз в час.</p>
+  <p class="small">Нажатия на кнопки скачивания засчитываются сразу; GitHub дополнительно считает сами файлы (с задержкой). Берётся большее из двух. Снимок по дням обновляется автоматически раз в час.</p>
 </main>
 <div class="tip" id="tip" hidden></div>
 
 <script src="config.js"></script>
+<script src="counts.js"></script>
 <script>
 (function () {
   var SITE = window.SITE;
@@ -161,20 +162,14 @@
       var history = s.history || [];
       var current = s.current || { pc: 0, android: 0 };
       render(current, history, s.updated);
-      if (SITE.repo.indexOf("OWNER/") === 0) return;
-      // живые цифры прямо из GitHub — свежее, чем часовой снимок
-      fetch("https://api.github.com/repos/" + SITE.repo + "/releases?per_page=100")
-        .then(function (r) { if (!r.ok) throw r; return r.json(); })
-        .then(function (rel) {
-          var c = { pc: 0, android: 0 };
-          rel.forEach(function (r) { r.assets.forEach(function (a) {
-            if (a.name === SITE.files.pc.name) c.pc += a.download_count;
-            if (a.name === SITE.files.android.name) c.android += a.download_count;
-          }); });
-          var now = new Date().toISOString();
-          render(c, history.concat([{ t: now, pc: c.pc, android: c.android }]), now);
-        })
-        .catch(function () {});
+      // живые цифры — свежее, чем часовой снимок
+      DMCounts.merged().then(function (c) {
+        if (!c) return;
+        c.pc = Math.max(c.pc, current.pc || 0);
+        c.android = Math.max(c.android, current.android || 0);
+        var now = new Date().toISOString();
+        render(c, history.concat([{ t: now, pc: c.pc, android: c.android }]), now);
+      });
     });
 })();
 </script>
